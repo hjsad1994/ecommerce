@@ -21,22 +21,19 @@ class AccessController {
 
             const result = await AccessService.signUp({ name, email, password });
 
-            if (!result.success) {
-                res.status(400).json({
+            if (result.error) {
+                res.status(result.code || 400).json({
                     success: false,
-                    message: "Đăng ký thất bại",
-                    error: result.error?.message
+                    message: result.error.message || "Đăng ký thất bại",
+                    error: result.error.code
                 } as ApiResponse);
                 return;
             }
 
-            res.status(201).json({
+            res.status(result.code || 201).json({
                 success: true,
                 message: "Đăng ký shop thành công",
-                data: result.data,
-                metadata: {
-                    timestamp: new Date().toISOString()
-                }
+                data: result.metadata
             } as ApiResponse);
 
         } catch (error) {
