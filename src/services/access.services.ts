@@ -53,33 +53,17 @@ class AccessService {
             }) as any;
 
             if (newShop) {
-                // created private key and public key with standard encoding
-                console.log('🔧 Generating RSA key pair...');
-                const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-                    modulusLength: 4096,
-                    publicKeyEncoding: {
-                        type: 'spki',
-                        format: 'pem'
-                    },
-                    privateKeyEncoding: {
-                        type: 'pkcs8',
-                        format: 'pem'
-                    }
-                });
-                console.log('✅ RSA key pair generated successfully');
-                console.log('Public key preview:', publicKey.substring(0, 100) + '...');
-                console.log('Private key preview:', privateKey.substring(0, 100) + '...');
+                const privateKey = crypto.randomBytes(64).toString('hex');
+                const publicKey = crypto.randomBytes(64).toString('hex');
                 
-                // Convert publicKey string to object for JWT verification
-                const publicKeyObject = crypto.createPublicKey(publicKey);
-                
-                // Save publicKey object to database
-                const publicKeyString = await KeyTokenService.createKeyToken({
+                // save key token to database
+                const keyStore = await KeyTokenService.createKeyToken({
                     userId: newShop._id,
-                    publicKey: publicKeyObject.export({ type: 'spki', format: 'pem' }).toString()
+                    publicKey,
+                    privateKey
                 });
 
-                if (!publicKeyString) {
+                if (!keyStore) {
                     return {
                         code: 400,
                         error: {
@@ -88,8 +72,7 @@ class AccessService {
                         }
                     }
                 }
-                console.log(`✅ KeyToken saved to database successfully`);
-                
+
                 // create token pair using privateKey to sign
                 const tokens = await createTokenPairs({
                     userId: newShop._id,

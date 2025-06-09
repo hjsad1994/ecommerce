@@ -2,12 +2,12 @@ import keyTokenModel from "@/models/keytoken.model";
 import { Types } from "mongoose";
 
 class KeyTokenServices {
-    static createKeyToken = async ({ userId, publicKey }: { userId: Types.ObjectId, publicKey: string }) => {
+    static createKeyToken = async ({ userId, publicKey, privateKey }: { userId: Types.ObjectId, publicKey: string, privateKey: string }) => {
         try {
-            const publicKeyString = publicKey.toString();
             const token = await keyTokenModel.create({
                 user: userId,
-                publicKey: publicKeyString,
+                publicKey: publicKey,
+                privateKey: privateKey
             })
             return token ? token.publicKey : null;
         } catch (error) {
