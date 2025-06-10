@@ -2,7 +2,18 @@ import { Request } from 'express';
 import { Types } from 'mongoose';
 
 // =============================================================================
-// Authentication Types
+// Custom Request Extensions
+// =============================================================================
+
+export interface AuthenticatedRequest extends Request {
+    user?: AuthenticatedUser;
+    shop?: AuthenticatedShop;
+    objKey?: any; // For API key middleware
+    keyStore?: any; // For key token storage
+}
+
+// =============================================================================
+// Authentication Types (Currently Used)
 // =============================================================================
 
 export interface JWTPayload {
@@ -19,11 +30,6 @@ export interface JWTTokens {
     refreshToken: string;
     expiresIn: number;
     tokenType: 'Bearer';
-}
-
-export interface AuthenticatedRequest extends Request {
-    user?: AuthenticatedUser;
-    shop?: AuthenticatedShop;
 }
 
 export interface AuthenticatedUser {
@@ -43,7 +49,7 @@ export interface AuthenticatedShop {
 }
 
 // =============================================================================
-// Login/Register Request Types
+// Login/Register Request Types (Currently Used)
 // =============================================================================
 
 export interface LoginRequest {
@@ -86,7 +92,7 @@ export interface ChangePasswordRequest {
 }
 
 // =============================================================================
-// Authentication Response Types
+// Authentication Response Types (Currently Used)
 // =============================================================================
 
 export interface LoginResponse {
@@ -119,38 +125,7 @@ export interface RefreshTokenResponse {
 }
 
 // =============================================================================
-// Role and Permission Types
-// =============================================================================
-
-export interface Role {
-    _id?: Types.ObjectId;
-    name: string;
-    description?: string;
-    permissions: string[];
-    isActive: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
-}
-
-export interface Permission {
-    _id?: Types.ObjectId;
-    name: string;
-    description?: string;
-    resource: string;
-    action: string;
-    conditions?: PermissionCondition[];
-    createdAt?: Date;
-    updatedAt?: Date;
-}
-
-export interface PermissionCondition {
-    field: string;
-    operator: 'eq' | 'ne' | 'in' | 'nin' | 'gt' | 'gte' | 'lt' | 'lte';
-    value: any;
-}
-
-// =============================================================================
-// Authorization Types
+// Authorization Context (For Middleware)
 // =============================================================================
 
 export interface AuthorizationContext {
@@ -169,57 +144,7 @@ export interface PermissionCheck {
 }
 
 // =============================================================================
-// Session Types
-// =============================================================================
-
-export interface Session {
-    _id?: Types.ObjectId;
-    userId: Types.ObjectId;
-    sessionId: string;
-    refreshToken: string;
-    userAgent?: string;
-    ipAddress?: string;
-    isActive: boolean;
-    lastAccessedAt: Date;
-    expiresAt: Date;
-    createdAt?: Date;
-    updatedAt?: Date;
-}
-
-export interface SessionCreateRequest {
-    userId: string;
-    refreshToken: string;
-    userAgent?: string;
-    ipAddress?: string;
-    expiresIn: number;
-}
-
-// =============================================================================
-// OTP and Verification Types
-// =============================================================================
-
-export interface OTPVerification {
-    _id?: Types.ObjectId;
-    email: string;
-    code: string;
-    type: 'email_verification' | 'password_reset' | 'login_2fa';
-    expiresAt: Date;
-    isUsed: boolean;
-    attempts: number;
-    createdAt?: Date;
-}
-
-export interface VerifyEmailRequest {
-    email: string;
-    code: string;
-}
-
-export interface ResendVerificationRequest {
-    email: string;
-}
-
-// =============================================================================
-// Auth Middleware Types
+// Auth Middleware Types (Currently Used)
 // =============================================================================
 
 export interface AuthMiddlewareOptions {

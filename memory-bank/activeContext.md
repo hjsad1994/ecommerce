@@ -1,141 +1,180 @@
 # Active Context - E-commerce Backend
 
 ## Current Work Focus
-**TypeScript Types System & API Foundation - COMPLETED** ✅
+**JWT Authentication System & Shop Registration API - COMPLETED** ✅
 
 Đã hoàn thành:
+- Complete shop registration với JWT authentication
 - TypeScript configuration với strict mode  
 - Express.js setup với type safety (Express 5.x compatibility issues resolved)
 - **Comprehensive TypeScript Types System** cho toàn bộ ecommerce domain
-- MongoDB Atlas connection với environment variables
-- Shop registration API endpoint hoàn chỉnh
+- MongoDB Atlas integration hoàn chỉnh
+- JWT token generation và management
 - Type-safe service và controller layers
 - Development workflow setup
 
 ## Recent Changes (Latest Session)
-1. **Comprehensive TypeScript Types System**
-   - **Created complete type definitions**: `src/types/index.ts`, `api.types.ts`, `auth.types.ts`, `models.types.ts`
-   - **API Types**: Response formats, error codes, pagination, file uploads
-   - **Auth Types**: JWT tokens, login/register, roles/permissions, sessions
-   - **Model Types**: Shop, Product, Order, Cart, Category, Review, Coupon, Wishlist
-   - **Type-safe service layer** với `ServiceResponse<T>` pattern
+1. **JWT Authentication System Implementation**
+   - **Fixed RSA key encoding issue**: Changed from `pkcs1` to `spki/pkcs8` format
+   - **Simplified key generation**: Using `crypto.randomBytes(64).toString('hex')` for production-ready keys
+   - **KeyToken Management**: Database storage cho public/private keys
+   - **Token Creation**: Access token (2 days) và refresh token (7 days) với HS256 algorithm
+   - **Error Handling**: Comprehensive error handling cho token creation failures
    
-2. **MongoDB Atlas Integration**
-   - Environment variables setup với `.env` file
-   - Type-safe configuration trong `env.config.ts`
-   - MongoDB connection với proper error handling
-   - Connection validation và debug logging
-   
-3. **Shop Registration API**
-   - **Controller**: Type-safe request/response với input validation
-   - **Service**: Business logic với comprehensive error handling  
-   - **Model**: Shop model với Mongoose integration
-   - **Route**: `/v1/api/shop/signup` POST endpoint hoàn chỉnh
-   
-4. **Development Fixes**
-   - Fixed path mapping với `tsconfig-paths` package
-   - Express 5.x compatibility resolved
-   - Development server running stable
+2. **Shop Registration API - FULLY WORKING**
+   - **Endpoint**: `POST /v1/api/shop/signup` - TESTED và WORKING ✅
+   - **Authentication Flow**: Email → Password hashing → Key generation → Token creation
+   - **Database Integration**: Shop data và KeyToken storage hoàn chỉnh
+   - **Response Format**: Standardized API response với shop info và tokens
+   - **Security**: bcrypt password hashing, JWT tokens, type-safe operations
 
-2. **Project Structure Created**
-   ```
-   src/
-   ├── types/index.ts           # Core TypeScript interfaces
-   ├── middleware/errorHandler.ts # Error handling system  
-   ├── utils/asyncHandler.ts    # Async wrapper utility
-   ├── app.ts                   # Express configuration
-   └── server.ts                # Application entry point
-   ```
+3. **TypeScript Type System Enhancements**
+   - **Fixed getInfoData utility**: Generic types với proper type constraints
+   - **Type-safe service responses**: ShopResponse interface với proper typing
+   - **Utility function**: `getInfoData<T>` cho selective field extraction
+   - **Error handling**: Type-safe error responses throughout
 
-3. **Development Workflow**
-   - npm scripts: dev, dev:ts, build, start, clean
-   - nodemon configuration cho TypeScript
-   - Production build process với dist/ folder
-
-4. **Type System Foundation**
-   - ApiResponse interface cho consistent API responses
-   - Core domain interfaces: User, Product, Order
-   - Error handling với custom AppError class
+4. **Database & Environment Setup**
+   - **MongoDB Atlas**: Fully connected và operational
+   - **Environment Config**: Type-safe `.env` configuration
+   - **Models**: Shop model và KeyToken model working
+   - **Connection Monitoring**: Active connection tracking
 
 ## Active Decisions & Considerations
 
 ### ✅ Completed Decisions:
 - **Language**: TypeScript với strict mode (type safety priority)
 - **Framework**: Express.js (mature, flexible)
+- **Database**: MongoDB Atlas với Mongoose
+- **Authentication**: JWT với symmetric key generation (HS256)
+- **Password Security**: bcrypt với salt rounds 10
 - **Architecture**: Layered architecture (Controllers → Services → Models)
 - **Error Handling**: Centralized error middleware với custom AppError
 - **API Format**: Standardized ApiResponse interface
-- **Development Setup**: ts-node + nodemon cho development
+- **Development Setup**: ts-node + nodemon với tsconfig-paths
 
-### 🔄 Pending Decisions:
-- **Database ORM**: Mongoose vs TypeORM vs Prisma
-- **Validation Library**: express-validator vs Joi vs Zod
-- **Authentication Strategy**: JWT implementation details
-- **Testing Framework**: Jest vs Vitest
-- **API Documentation**: Swagger/OpenAPI setup
+### 🔄 Next Implementation Priorities:
+1. **Shop Login API** - Complement registration với login functionality
+2. **JWT Verification Middleware** - Protect routes và user authentication
+3. **Role-based Authorization** - Admin vs Shop user permissions
+4. **Product Management APIs** - CRUD operations cho products
+5. **Input Validation** - express-validator hoặc Joi integration
+
+## Current Working Features
+
+### 🟢 Fully Functional:
+1. **Shop Registration API** (`POST /v1/api/shop/signup`)
+   - Input validation (name, email, password required)
+   - Email uniqueness check
+   - Password hashing với bcrypt
+   - JWT token generation (access + refresh)
+   - Database storage (shop + keytokens)
+   - Type-safe responses
+   
+2. **Server Infrastructure**
+   - Express.js server on port 3052
+   - MongoDB Atlas connection
+   - Error handling middleware
+   - Security headers (helmet)
+   - Request logging (morgan)
+   - CORS and compression
+
+3. **Development Workflow**
+   - Hot reload với nodemon
+   - TypeScript compilation
+   - Path mapping (@/* aliases)
+   - Environment variable management
 
 ## Next Immediate Steps
 
-### Phase 1: Database Integration (Next Priority)
-1. **Choose và setup database solution**
-   - MongoDB với Mongoose (recommended)
-   - Connection configuration
-   - Environment variables setup
+### Phase 1: Complete Authentication System (IMMEDIATE)
+1. **Shop Login API**
+   - `POST /v1/api/shop/login` endpoint
+   - Email/password validation
+   - JWT token refresh mechanism
+   - Session management
 
-2. **Create Models**
-   - User model với authentication fields
-   - Product model với inventory tracking
-   - Order model với relationships
+2. **JWT Middleware**
+   - Token verification middleware
+   - User context injection
+   - Protected route implementation
+   - Token refresh handling
 
-3. **Database Configuration**
-   - Connection string management
-   - Database seeding scripts
-   - Migration strategy
+### Phase 2: Product Management System
+1. **Product CRUD APIs**
+   - Create, read, update, delete products
+   - Image upload support
+   - Category assignment
+   - Inventory management
 
-### Phase 2: Authentication System
-1. **JWT Implementation**
-   - User registration/login endpoints
-   - JWT token generation/verification
-   - Password hashing với bcrypt
+2. **Category Management**
+   - Category CRUD operations
+   - Hierarchical categories
+   - Category-product relationships
 
-2. **Authorization Middleware**
-   - Role-based access control
-   - Protected routes implementation
-   - User context trong requests
+### Phase 3: Order & Cart System
+1. **Shopping Cart**
+   - Add/remove items
+   - Update quantities
+   - Persistent storage
 
-### Phase 3: Core API Endpoints
-1. **User Management**
-   - CRUD operations
-   - Profile management
-   - Admin user operations
-
-2. **Product Management**
-   - Product CRUD với image handling
-   - Category management
-   - Search và filtering
-
-3. **Order Processing**
-   - Cart management
-   - Order creation và tracking
-   - Payment integration planning
+2. **Order Processing**
+   - Cart to order conversion
+   - Order status management
+   - Payment integration prep
 
 ## Current Status Assessment
-- ✅ **Foundation**: TypeScript setup hoàn chỉnh
-- ✅ **Architecture**: Clean structure established  
-- ✅ **Development Workflow**: Fully functional
-- 🔄 **Database**: Not yet connected
-- 🔄 **Authentication**: Not implemented
-- 🔄 **API Endpoints**: Only basic health check
+- ✅ **Foundation**: 100% Complete
+- ✅ **Database**: 100% Operational (MongoDB Atlas)
+- ✅ **Authentication**: 60% Complete (registration working, login needed)
+- ✅ **Shop Registration**: 100% Working
+- 🔄 **Protected Routes**: 0% (middleware needed)
+- 🔄 **Product Management**: 0%
+- 🔄 **Order System**: 0%
 
-## Technical Debt & Considerations
-- Need environment variable management (.env)
-- Testing setup chưa có
-- Linting và formatting setup (ESLint, Prettier)
-- API documentation strategy
-- Deployment configuration
+## Technical Architecture Established
+
+### Current Tech Stack:
+- **Runtime**: Node.js với TypeScript strict mode
+- **Framework**: Express.js 5.x
+- **Database**: MongoDB Atlas với Mongoose ODM
+- **Authentication**: JWT với crypto-generated keys
+- **Password Security**: bcrypt hashing
+- **Development**: nodemon + ts-node với path mapping
+- **Type Safety**: Comprehensive TypeScript type system
+
+### Project Structure:
+```
+src/
+├── auth/authUtils.ts          # JWT token creation
+├── configs/env.config.ts      # Environment configuration  
+├── controllers/access.controller.ts  # Shop authentication
+├── dbs/init.mongodb.ts        # MongoDB connection
+├── helpers/check.connect.ts   # Connection monitoring
+├── models/shop.model.ts       # Shop schema
+├── models/keytoken.model.ts   # JWT key storage
+├── routes/index.ts            # Main router
+├── routes/accessRouter/index.ts  # Auth routes
+├── services/access.services.ts   # Auth business logic
+├── services/keyToken.service.ts  # Key management
+├── types/                     # TypeScript definitions
+├── Utils/index.ts             # Utility functions
+├── app.ts                     # Express configuration
+└── server.ts                  # Application entry point
+```
+
+## Memory Bank Updates Completed
+- Updated activeContext.md với latest authentication implementation
+- Documented working shop registration API
+- Tracked JWT authentication system completion
+- Noted TypeScript fixes và utility improvements
+- Updated technical architecture documentation
 
 ## Team Notes
-- Project sử dụng Tiếng Việt cho documentation
-- Memory Bank system để track progress across sessions
-- Focus on type safety và clean architecture
-- RESTful API design principles 
+- API đã tested và working: `POST /v1/api/shop/signup`
+- Server running stable trên port 3052
+- MongoDB Atlas connection established
+- JWT tokens generated successfully
+- Ready for next phase: Shop login API implementation
+- All TypeScript compilation errors resolved
+- Development workflow fully functional 

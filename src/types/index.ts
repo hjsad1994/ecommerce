@@ -46,7 +46,7 @@ export interface AuthenticatedRequest extends Request {
 }
 
 // =============================================================================
-// Shop/User Types
+// Core Shop/User Types (Essential for current implementation)
 // =============================================================================
 
 export interface Shop {
@@ -402,7 +402,7 @@ export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type Required<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 // =============================================================================
-// Export all types
+// Export all types from specific files
 // =============================================================================
 
 export * from './api.types';

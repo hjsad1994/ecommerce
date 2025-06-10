@@ -20,7 +20,7 @@ const keyTokenSchema = new Schema({
     refreshToken: {
         type: Array,
         default: [] // những RT đã được sử dụng
-    },  
+    },
 }, {
     timestamps: true,
     collection: COLLECTION_NAME

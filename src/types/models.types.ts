@@ -19,7 +19,24 @@ export interface TimestampedModel extends BaseModel {
 }
 
 // =============================================================================
-// Shop/User Model Types
+// Authentication Model Types
+// =============================================================================
+
+export interface ApiKey extends BaseModel {
+    key: string;
+    status: boolean;
+    permissions: string[];
+}
+
+export interface KeyToken extends BaseModel {
+    user: Types.ObjectId | Shop;
+    publicKey: string;
+    privateKey: string;
+    refreshToken: string[];
+}
+
+// =============================================================================
+// Shop/User Model Types (Currently Implemented)
 // =============================================================================
 
 export interface Shop extends BaseModel {
@@ -30,7 +47,6 @@ export interface Shop extends BaseModel {
     verify: boolean;
     roles: string[];
     profile?: ShopProfile;
-    settings?: ShopSettings;
     lastLoginAt?: Date;
     emailVerifiedAt?: Date;
 }
@@ -43,43 +59,6 @@ export interface ShopProfile {
     phone?: string;
     website?: string;
     address?: Address;
-    socialMedia?: SocialMediaLinks;
-}
-
-export interface ShopSettings {
-    notifications: NotificationSettings;
-    privacy: PrivacySettings;
-    business: BusinessSettings;
-}
-
-export interface NotificationSettings {
-    email: boolean;
-    sms: boolean;
-    push: boolean;
-    orderUpdates: boolean;
-    marketingEmails: boolean;
-}
-
-export interface PrivacySettings {
-    profileVisible: boolean;
-    allowMessages: boolean;
-    showOnlineStatus: boolean;
-}
-
-export interface BusinessSettings {
-    autoApproveOrders: boolean;
-    allowReturns: boolean;
-    returnWindow: number; // days
-    currency: string;
-    timezone: string;
-}
-
-export interface SocialMediaLinks {
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-    linkedin?: string;
-    youtube?: string;
 }
 
 export interface Address {
@@ -93,7 +72,7 @@ export interface Address {
 }
 
 // =============================================================================
-// Product Model Types
+// Product Model Types (For Next Phase)
 // =============================================================================
 
 export interface Product extends TimestampedModel {
@@ -103,33 +82,15 @@ export interface Product extends TimestampedModel {
     shortDescription?: string;
     price: number;
     salePrice?: number;
-    cost?: number;
     sku: string;
-    barcode?: string;
     quantity: number;
-    minQuantity?: number;
-    maxQuantity?: number;
-    weight?: number;
-    dimensions?: ProductDimensions;
     category: Types.ObjectId | Category;
-    subcategory?: Types.ObjectId | Category;
-    brand?: Types.ObjectId | Brand;
     shop: Types.ObjectId | Shop;
     images: ProductImage[];
     attributes: ProductAttribute[];
-    variations?: ProductVariation[];
     tags: string[];
     status: 'active' | 'inactive' | 'draft' | 'out_of_stock';
     featured: boolean;
-    seoData?: SEOData;
-    inventory?: InventoryData;
-}
-
-export interface ProductDimensions {
-    length: number;
-    width: number;
-    height: number;
-    unit: 'cm' | 'inch';
 }
 
 export interface ProductImage {
@@ -149,40 +110,8 @@ export interface ProductAttribute {
     isFilterable?: boolean;
 }
 
-export interface ProductVariation {
-    name: string;
-    type: 'color' | 'size' | 'material' | 'style';
-    options: VariationOption[];
-}
-
-export interface VariationOption {
-    name: string;
-    value: string;
-    price: number;
-    salePrice?: number;
-    quantity: number;
-    sku?: string;
-    image?: string;
-    isDefault?: boolean;
-}
-
-export interface SEOData {
-    title?: string;
-    description?: string;
-    keywords?: string[];
-    canonicalUrl?: string;
-}
-
-export interface InventoryData {
-    trackQuantity: boolean;
-    allowBackorders: boolean;
-    lowStockThreshold?: number;
-    reservedQuantity: number;
-    availableQuantity: number;
-}
-
 // =============================================================================
-// Category Model Types
+// Category Model Types (For Next Phase)
 // =============================================================================
 
 export interface Category extends TimestampedModel {
@@ -198,24 +127,11 @@ export interface Category extends TimestampedModel {
     status: 'active' | 'inactive';
     featured: boolean;
     sortOrder: number;
-    seoData?: SEOData;
-    productCount?: number;
-}
-
-export interface Brand extends TimestampedModel {
-    name: string;
-    slug: string;
-    description?: string;
-    logo?: string;
-    website?: string;
-    status: 'active' | 'inactive';
-    featured: boolean;
-    seoData?: SEOData;
     productCount?: number;
 }
 
 // =============================================================================
-// Order Model Types
+// Order Model Types (For Later Phase)
 // =============================================================================
 
 export interface Order extends TimestampedModel {
@@ -229,18 +145,11 @@ export interface Order extends TimestampedModel {
     totalAmount: number;
     status: OrderStatus;
     paymentStatus: PaymentStatus;
-    fulfillmentStatus: FulfillmentStatus;
     paymentMethod: PaymentMethod;
-    paymentDetails?: PaymentDetails;
     shippingAddress: Address;
     billingAddress?: Address;
-    shippingMethod?: ShippingMethod;
     notes?: string;
-    internalNotes?: string;
     tracking?: TrackingInfo;
-    refunds?: Refund[];
-    timeline: OrderTimeline[];
-    metadata?: Record<string, any>;
 }
 
 export interface OrderItem {
@@ -253,7 +162,6 @@ export interface OrderItem {
     totalPrice: number;
     variation?: string;
     attributes?: ProductAttribute[];
-    notes?: string;
 }
 
 export type OrderStatus = 
@@ -263,23 +171,14 @@ export type OrderStatus =
     | 'shipped' 
     | 'delivered' 
     | 'cancelled' 
-    | 'refunded'
-    | 'on_hold';
+    | 'refunded';
 
 export type PaymentStatus = 
     | 'pending' 
     | 'paid' 
     | 'failed' 
     | 'refunded' 
-    | 'partially_refunded'
-    | 'authorized'
-    | 'cancelled';
-
-export type FulfillmentStatus = 
-    | 'unfulfilled'
-    | 'partially_fulfilled'
-    | 'fulfilled'
-    | 'restocked';
+    | 'partially_refunded';
 
 export type PaymentMethod = 
     | 'credit_card' 
@@ -287,24 +186,7 @@ export type PaymentMethod =
     | 'paypal' 
     | 'stripe'
     | 'bank_transfer' 
-    | 'cash_on_delivery'
-    | 'wallet';
-
-export interface PaymentDetails {
-    provider: string;
-    transactionId?: string;
-    gatewayResponse?: Record<string, any>;
-    cardLast4?: string;
-    cardBrand?: string;
-}
-
-export interface ShippingMethod {
-    name: string;
-    code: string;
-    cost: number;
-    estimatedDays: number;
-    trackingSupported: boolean;
-}
+    | 'cash_on_delivery';
 
 export interface TrackingInfo {
     carrier: string;
@@ -312,36 +194,10 @@ export interface TrackingInfo {
     trackingUrl?: string;
     estimatedDelivery?: Date;
     actualDelivery?: Date;
-    events: TrackingEvent[];
-}
-
-export interface TrackingEvent {
-    status: string;
-    description: string;
-    location?: string;
-    timestamp: Date;
-}
-
-export interface Refund {
-    _id?: Types.ObjectId;
-    amount: number;
-    reason: string;
-    status: 'pending' | 'processed' | 'failed';
-    processedAt?: Date;
-    transactionId?: string;
-    notes?: string;
-    createdAt: Date;
-}
-
-export interface OrderTimeline {
-    status: OrderStatus;
-    timestamp: Date;
-    note?: string;
-    updatedBy?: Types.ObjectId;
 }
 
 // =============================================================================
-// Cart Model Types
+// Cart Model Types (For Later Phase)
 // =============================================================================
 
 export interface Cart extends BaseModel {
@@ -363,68 +219,6 @@ export interface CartItem {
     unitPrice: number;
     totalPrice: number;
     variation?: string;
-    attributes?: ProductAttribute[];
     addedAt: Date;
     updatedAt: Date;
-}
-
-// =============================================================================
-// Review Model Types
-// =============================================================================
-
-export interface Review extends TimestampedModel {
-    product: Types.ObjectId | Product;
-    user: Types.ObjectId | Shop;
-    order?: Types.ObjectId | Order;
-    rating: number;
-    title?: string;
-    comment?: string;
-    images?: string[];
-    verified: boolean;
-    helpful: number;
-    reported: number;
-    status: 'pending' | 'approved' | 'rejected';
-    moderatorNote?: string;
-}
-
-// =============================================================================
-// Coupon Model Types
-// =============================================================================
-
-export interface Coupon extends TimestampedModel {
-    code: string;
-    name: string;
-    description?: string;
-    type: 'percentage' | 'fixed_amount' | 'free_shipping';
-    value: number;
-    minimumAmount?: number;
-    maximumDiscount?: number;
-    usageLimit?: number;
-    usageCount: number;
-    userLimit?: number;
-    startDate: Date;
-    endDate: Date;
-    applicableProducts?: Types.ObjectId[];
-    applicableCategories?: Types.ObjectId[];
-    excludedProducts?: Types.ObjectId[];
-    excludedCategories?: Types.ObjectId[];
-    status: 'active' | 'inactive' | 'expired';
-    isFirstTimeUser?: boolean;
-}
-
-// =============================================================================
-// Wishlist Model Types
-// =============================================================================
-
-export interface Wishlist extends BaseModel {
-    user: Types.ObjectId | Shop;
-    items: WishlistItem[];
-    name: string;
-    isPublic: boolean;
-}
-
-export interface WishlistItem {
-    product: Types.ObjectId | Product;
-    addedAt: Date;
-    notes?: string;
 } 
