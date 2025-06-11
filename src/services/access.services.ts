@@ -53,14 +53,14 @@ class AccessService {
             }) as any;
 
             if (newShop) {
-                const privateKey = crypto.randomBytes(64).toString('hex');
-                const publicKey = crypto.randomBytes(64).toString('hex');
+                const accessTokenSecret = crypto.randomBytes(64).toString('hex');
+                const refreshTokenSecret = crypto.randomBytes(64).toString('hex');
                 
                 // save key token to database
                 const keyStore = await KeyTokenService.createKeyToken({
                     userId: newShop._id,
-                    publicKey,
-                    privateKey
+                    publicKey: accessTokenSecret,  // access token secret
+                    privateKey: refreshTokenSecret // refresh token secret
                 });
 
                 if (!keyStore) {
@@ -73,11 +73,11 @@ class AccessService {
                     }
                 }
 
-                // create token pair using privateKey to sign
+                // create token pair using secrets
                 const tokens = await createTokenPairs({
                     userId: newShop._id,
                     email,
-                }, publicKey, privateKey);
+                }, accessTokenSecret, refreshTokenSecret);
                 
                 if (!tokens) {
                     return {

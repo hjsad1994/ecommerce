@@ -12,10 +12,12 @@ const keyTokenSchema = new Schema({
     publicKey: {
         type: String,
         required: true
+        // Lưu access token secret (symmetric key)
     },
     privateKey: {
         type: String,
         required: true
+        // Lưu refresh token secret (symmetric key)  
     },
     refreshToken: {
         type: Array,

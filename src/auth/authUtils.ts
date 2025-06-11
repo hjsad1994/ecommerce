@@ -1,17 +1,18 @@
 
 import jwt from "jsonwebtoken";
 
-const createTokenPairs = async (payload: any, publicKey: string, privateKey: string) => {
+const createTokenPairs = async (payload: any, accessTokenSecret: string, refreshTokenSecret: string) => {
     try {
         console.log('🔑 Creating token pairs...');
         console.log('Payload:', JSON.stringify(payload, null, 2));
         
-        // create access token
-        const accessToken = jwt.sign(payload, privateKey, {
+        // create access token using access token secret
+        const accessToken = jwt.sign(payload, accessTokenSecret, {
             expiresIn: '2 days'
         });
         
-        const refreshToken = jwt.sign(payload, privateKey, {
+        // create refresh token using refresh token secret
+        const refreshToken = jwt.sign(payload, refreshTokenSecret, {
             expiresIn: '7 days'
         });
         
