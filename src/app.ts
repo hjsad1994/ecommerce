@@ -1,10 +1,11 @@
-import express, { Request, Response, NextFunction, ErrorRequestHandler } from "express";
+import express from "express";
+import type { Request, Response, NextFunction, ErrorRequestHandler } from "express";
+
 import morgan from "morgan";
 import helmet from "helmet";
 import compression from "compression";
 import { checkOverload } from "./helpers/check.connect";
 import router from "./routes";
-// import "./types/express"; // Import custom type declarations
 const app = express();
 
 // init middleware
@@ -36,20 +37,20 @@ const errorHandler: ErrorRequestHandler = (error: any, req: Request, res: Respon
     const statusCode = error.status || 500;
     const errorMessage = error.message || 'Internal Server Error';
     
-    // Log error for debugging
+    // Log error for debugging (chỉ log, không trả về stack)
     console.error('💥 Error occurred:', {
         statusCode,
         message: errorMessage,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        stack: error.stack,
         path: req.path,
         method: req.method
     });
     
+    // Response không bao gồm stack trace
     res.status(statusCode).json({
         status: 'error',
         code: statusCode,
-        message: errorMessage,
-        ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+        message: errorMessage
     });
 };
 

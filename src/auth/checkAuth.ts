@@ -44,10 +44,4 @@ const permission = (permission: string) => {
         return next();
     }
 }
-
-const asyncHandler = (func: any) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        Promise.resolve(func(req, res, next)).catch(next);
-    }
-}
-export { apiKey, permission, asyncHandler };
+export { apiKey, permission };

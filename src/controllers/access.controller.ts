@@ -1,20 +1,16 @@
 import { NextFunction, Request, Response } from "express";
-import { ShopSignUpRequest } from "@/types";
 import AccessService from "@/services/access.services";
 import { CREATED } from "@/core/success.respone";
+import { handleError } from "@/middlewares/handle.error";
 
 class AccessController {
-    signUp = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const result = await AccessService.signUp(req.body);
-            new CREATED({
-                message: 'Shop registered successfully',
-                metadata: result
-            }).send(res);
-        } catch (error) {
-            next(error);
-        }
-    }
+    signUp = handleError(async (req: Request, res: Response, next: NextFunction) => {
+        const result = await AccessService.signUp(req.body);
+        new CREATED({
+            message: 'Shop registered successfully',
+            metadata: result
+        }).send(res);
+    })
 }
 
 export default new AccessController();
