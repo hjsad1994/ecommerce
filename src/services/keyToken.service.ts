@@ -19,7 +19,7 @@ class KeyTokenServices {
                 refreshToken
             }
             const options = {
-                upsert: true,
+                upsert: true, // if the document does not exist, it will be created
                 new: true,
             }
             const tokens = await keyTokenModel.findOneAndUpdate(filter, update, options)
