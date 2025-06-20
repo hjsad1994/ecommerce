@@ -39,6 +39,7 @@ class AccessService {
      */
     static login = async ({ email, password, refreshToken}: ShopLoginRequest): Promise<AccessServiceResponse> => {
         const foundShop = await shopServices.findByEmail(email);
+        const {_id: userId} = foundShop;
         if(!foundShop) {
             throw new NotFoundError('Shop not found. Please check your email and password.');
         }
@@ -49,7 +50,7 @@ class AccessService {
         const privateKey = crypto.randomBytes(64).toString('hex');
         const publicKey = crypto.randomBytes(64).toString('hex');
         const tokens = await createTokenPairs({
-            userId: foundShop._id,
+            userId,
             email,
         }, privateKey, publicKey);
         
@@ -58,7 +59,7 @@ class AccessService {
         }
         
         await KeyTokenService.createKeyToken({
-            userId: foundShop._id,
+            userId,
             publicKey,
             privateKey,
             refreshToken: tokens.refreshToken
