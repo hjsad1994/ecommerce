@@ -1,11 +1,12 @@
 import shopModel from "@/models/shop.model";
-import { ShopSignUpRequest, Shop } from "@/types";
+import { ShopSignUpRequest, Shop, ShopLoginRequest } from "@/types";
 import bcrypt from "bcrypt";
 import KeyTokenService from "@/services/keyToken.service";
 import createTokenPairs from "@/auth/authUtils";
 import getInfoData from "@/Utils";
 import crypto from "crypto";
-import { BadRequestError, InternalServerError, ConflictRequestError } from "@/core/error.respone";
+import { BadRequestError, InternalServerError, ConflictRequestError, NotFoundError } from "@/core/error.respone";
+import shopServices from "./shop.services";
 
 interface ShopResponse {
     _id: string;
@@ -29,7 +30,50 @@ const roleShop = {
     ADMIN: 'ADMIN',
 }
 class AccessService {
-    signUp = async ({ email, password, name }: ShopSignUpRequest): Promise<AccessServiceResponse> => {
+    /*
+    1. check email exist
+    2. compare password
+    3. create access token and refresh token
+    4. generate refresh token
+    5. get data return login
+     */
+    static login = async ({ email, password, refreshToken}: ShopLoginRequest): Promise<AccessServiceResponse> => {
+        const foundShop = await shopServices.findByEmail(email);
+        if(!foundShop) {
+            throw new NotFoundError('Shop not found. Please check your email and password.');
+        }
+        const match = await bcrypt.compare(password, foundShop.password);
+        if(!match) {
+            throw new BadRequestError('Invalid password. Please try again.');
+        }
+        const privateKey = crypto.randomBytes(64).toString('hex');
+        const publicKey = crypto.randomBytes(64).toString('hex');
+        const tokens = await createTokenPairs({
+            userId: foundShop._id,
+            email,
+        }, privateKey, publicKey);
+        
+        if (!tokens) {
+            throw new InternalServerError('Failed to generate authentication tokens. Please try again.');
+        }
+        
+        await KeyTokenService.createKeyToken({
+            userId: foundShop._id,
+            publicKey,
+            privateKey,
+            refreshToken: tokens.refreshToken
+        });
+        
+        return {
+                shop: getInfoData<ShopResponse>({
+                    fields: ['_id', 'name', 'email'],
+                    object: foundShop as ShopResponse
+                }),
+                tokens: tokens as any
+        }
+
+    }
+    static signUp = async ({ email, password, name }: ShopSignUpRequest): Promise<AccessServiceResponse> => {
         // check email exist
         const holderShop = await shopModel.findOne({ email }).lean();
 
@@ -53,17 +97,6 @@ class AccessService {
         const accessTokenSecret = crypto.randomBytes(64).toString('hex');
         const refreshTokenSecret = crypto.randomBytes(64).toString('hex');
         
-        // save key token to database
-        const keyStore = await KeyTokenService.createKeyToken({
-            userId: newShop._id,
-            publicKey: accessTokenSecret,  // access token secret
-            privateKey: refreshTokenSecret // refresh token secret
-        });
-
-        if (!keyStore) {
-            throw new InternalServerError('Failed to create authentication keys. Please try again.');
-        }
-
         // create token pair using secrets
         const tokens = await createTokenPairs({
             userId: newShop._id,
@@ -72,6 +105,18 @@ class AccessService {
         
         if (!tokens) {
             throw new InternalServerError('Failed to generate authentication tokens. Please try again.');
+        }
+        
+        // save key token to database
+        const keyStore = await KeyTokenService.createKeyToken({
+            userId: newShop._id,
+            publicKey: accessTokenSecret,  // access token secret
+            privateKey: refreshTokenSecret, // refresh token secret
+            refreshToken: tokens.refreshToken
+        });
+
+        if (!keyStore) {
+            throw new InternalServerError('Failed to create authentication keys. Please try again.');
         }
         
         console.log(`✅ Created tokens successfully`);
@@ -86,4 +131,4 @@ class AccessService {
     }
 }
 
-export default new AccessService();
+export default AccessService;

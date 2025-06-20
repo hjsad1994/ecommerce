@@ -70,6 +70,7 @@ export interface ShopSignUpRequest {
 export interface ShopLoginRequest {
     email: string;
     password: string;
+    refreshToken?: string;
 }
 
 export interface ShopSignUpResponse {

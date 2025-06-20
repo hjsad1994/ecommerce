@@ -19,10 +19,14 @@ const keyTokenSchema = new Schema({
         required: true
         // Lưu refresh token secret (symmetric key)  
     },
-    refreshToken: {
+    refreshTokenUsed: {
         type: Array,
         default: [] // những RT đã được sử dụng
     },
+    refreshToken: {
+        type: String,
+        required: true
+    }
 }, {
     timestamps: true,
     collection: COLLECTION_NAME

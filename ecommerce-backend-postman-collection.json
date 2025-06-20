@@ -1,0 +1,115 @@
+{
+	"info": {
+		"_postman_id": "ecommerce-backend-collection",
+		"name": "E-commerce Backend API",
+		"description": "Collection for testing E-commerce Backend NodeJS API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Shop Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Shop\",\n    \"email\": \"testshop@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/signup",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "signup"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Shop Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testshop@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/login",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "login"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Server Health",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/api",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3052",
+			"type": "string"
+		},
+		{
+			"key": "api_key",
+			"value": "replace-with-your-api-key",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 

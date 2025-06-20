@@ -5,5 +5,5 @@ const accessRouter = express.Router();
 
 // sign up
 accessRouter.post("/shop/signup", handleError(AccessController.signUp));
-
+accessRouter.post("/shop/login", handleError(AccessController.login));
 export default accessRouter;
