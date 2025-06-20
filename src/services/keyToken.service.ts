@@ -28,6 +28,12 @@ class KeyTokenServices {
             return error;
         }
     }
+    static findByUserId = async (userId: Types.ObjectId) => {
+        return await keyTokenModel.findOne({ user: userId }).lean();
+    }
+    static removeKeyById = async (id: Types.ObjectId) => {
+        return await keyTokenModel.deleteOne({ _id: id });
+    }
 
 }
 

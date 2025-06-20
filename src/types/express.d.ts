@@ -1,6 +1,13 @@
-// src/types/express.ts
+// src/types/express.d.ts
+
+// Extend Express Request interface để add custom properties
 declare global {
     namespace Express {
+        interface Request {
+            keyStore?: any; // KeyToken storage from authentication middleware
+            objKey?: any;   // API key object from checkAuth middleware
+        }
+        
         interface Error {
             status?: number;
         }

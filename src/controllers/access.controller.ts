@@ -1,9 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import AccessService from "@/services/access.services";
-import { CREATED } from "@/core/success.respone";
+import { CREATED, SuccessResponse } from "@/core/success.respone";
 import { handleError } from "@/middlewares/handle.error";
+import { AuthenticatedRequest } from "@/types";
 
 class AccessController {
+    logout = handleError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        const result = await AccessService.logout(req.keyStore);
+        new SuccessResponse({
+            message: 'Logout successfully',
+            metadata: result
+        }).send(res);
+        
+    })
     login = handleError(async (req: Request, res: Response, next: NextFunction) => {
         const result = await AccessService.login(req.body);
         new CREATED({

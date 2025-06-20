@@ -1,5 +1,5 @@
 import shopModel from "@/models/shop.model";
-import { ShopSignUpRequest, Shop, ShopLoginRequest } from "@/types";
+import { ShopSignUpRequest, Shop, ShopLoginRequest, ShopLogoutRequest } from "@/types";
 import bcrypt from "bcrypt";
 import KeyTokenService from "@/services/keyToken.service";
 import createTokenPairs from "@/auth/authUtils";
@@ -30,6 +30,12 @@ const roleShop = {
     ADMIN: 'ADMIN',
 }
 class AccessService {
+
+    static logout = async (keyStore: any) => {
+        const delKey = await KeyTokenService.removeKeyById(keyStore._id);
+        console.log(delKey);
+        return delKey;
+    }
     /*
     1. check email exist
     2. compare password
@@ -47,23 +53,42 @@ class AccessService {
         if(!match) {
             throw new BadRequestError('Invalid password. Please try again.');
         }
-        const privateKey = crypto.randomBytes(64).toString('hex');
-        const publicKey = crypto.randomBytes(64).toString('hex');
+        
+        // Generate new keys for this login session
+        const accessTokenSecret = crypto.randomBytes(64).toString('hex');
+        const refreshTokenSecret = crypto.randomBytes(64).toString('hex');
+        
+        // First, update the keystore with new keys to ensure consistency
+        const keyStore = await KeyTokenService.createKeyToken({
+            userId,
+            publicKey: accessTokenSecret,
+            privateKey: refreshTokenSecret,
+            refreshToken: 'temp' // temporary, will be updated below
+        });
+        
+        if (!keyStore) {
+            throw new InternalServerError('Failed to create authentication keys. Please try again.');
+        }
+        
+        // Now create tokens with the same keys that are stored in database
         const tokens = await createTokenPairs({
             userId,
             email,
-        }, privateKey, publicKey);
+        }, accessTokenSecret, refreshTokenSecret);
         
         if (!tokens) {
             throw new InternalServerError('Failed to generate authentication tokens. Please try again.');
         }
         
+        // Finally, update the refresh token in the keystore
         await KeyTokenService.createKeyToken({
             userId,
-            publicKey,
-            privateKey,
+            publicKey: accessTokenSecret,
+            privateKey: refreshTokenSecret,
             refreshToken: tokens.refreshToken
         });
+        
+        console.log('✅ Login successful with consistent keys');
         
         return {
                 shop: getInfoData<ShopResponse>({

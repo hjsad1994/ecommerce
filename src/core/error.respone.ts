@@ -76,5 +76,10 @@ class InternalServerError extends ErrorResponse {
     }
 }
 
+class UnauthorizedError extends ErrorResponse {
+    constructor(message = ReasonStatusCode.UNAUTHORIZED, status: number = StatusCode.UNAUTHORIZED) {
+        super(message, status);
+    }
+}
 
-export { ErrorResponse, ConflictRequestError, BadRequestError, AuthFailureError, NotFoundError, ForbiddenError, InternalServerError };
+export { ErrorResponse, ConflictRequestError, BadRequestError, AuthFailureError, NotFoundError, ForbiddenError, InternalServerError, UnauthorizedError };

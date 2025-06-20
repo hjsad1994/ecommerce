@@ -43,6 +43,8 @@ export interface AuthenticatedRequest extends Request {
         email: string;
         roles: string[];
     };
+    keyStore?: any; // KeyToken storage from authentication middleware
+    objKey?: any;   // API key object from checkAuth middleware
 }
 
 // =============================================================================
@@ -68,6 +70,12 @@ export interface ShopSignUpRequest {
 }
 
 export interface ShopLoginRequest {
+    email: string;
+    password: string;
+    refreshToken?: string;
+}
+
+export interface ShopLogoutRequest {
     email: string;
     password: string;
     refreshToken?: string;
