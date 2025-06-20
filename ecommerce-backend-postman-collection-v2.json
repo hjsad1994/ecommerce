@@ -1,0 +1,649 @@
+{
+	"info": {
+		"_postman_id": "ecommerce-backend-collection-v2",
+		"name": "E-commerce Backend API - Enhanced with Refresh Token",
+		"description": "Enhanced collection for testing E-commerce Backend NodeJS API with automated token management and refresh token logic",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Shop Sign Up",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test response status",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"// Test response structure",
+									"pm.test(\"Response has correct structure\", function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"    pm.expect(responseJson).to.have.property('message');",
+									"    pm.expect(responseJson).to.have.property('metadata');",
+									"});",
+									"",
+									"// Save tokens and user info if successful",
+									"if (pm.response.code === 201) {",
+									"    const responseJson = pm.response.json();",
+									"    const metadata = responseJson.metadata;",
+									"    ",
+									"    if (metadata && metadata.tokens) {",
+									"        // Save tokens to environment",
+									"        pm.environment.set(\"access_token\", metadata.tokens.accessToken);",
+									"        pm.environment.set(\"refresh_token\", metadata.tokens.refreshToken);",
+									"        ",
+									"        // Save user info",
+									"        if (metadata.shop && metadata.shop._id) {",
+									"            pm.environment.set(\"user_id\", metadata.shop._id);",
+									"            pm.environment.set(\"user_email\", metadata.shop.email);",
+									"        }",
+									"        ",
+									"        console.log(\"✅ Tokens saved to environment:\");",
+									"        console.log(\"Access Token:\", metadata.tokens.accessToken.substring(0, 20) + \"...\");",
+									"        console.log(\"Refresh Token:\", metadata.tokens.refreshToken.substring(0, 20) + \"...\");",
+									"        console.log(\"User ID:\", metadata.shop._id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{shop_name}}\",\n    \"email\": \"{{shop_email}}\",\n    \"password\": \"{{shop_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/signup",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "signup"]
+						},
+						"description": "Register a new shop with automatic token saving"
+					},
+					"response": []
+				},
+				{
+					"name": "Shop Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test response status",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"// Test response structure",
+									"pm.test(\"Response has correct structure\", function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"    pm.expect(responseJson).to.have.property('message');",
+									"    pm.expect(responseJson).to.have.property('metadata');",
+									"});",
+									"",
+									"// Save tokens and user info if successful",
+									"if (pm.response.code === 201) {",
+									"    const responseJson = pm.response.json();",
+									"    const metadata = responseJson.metadata;",
+									"    ",
+									"    if (metadata && metadata.tokens) {",
+									"        // Save new tokens to environment",
+									"        pm.environment.set(\"access_token\", metadata.tokens.accessToken);",
+									"        pm.environment.set(\"refresh_token\", metadata.tokens.refreshToken);",
+									"        ",
+									"        // Save user info",
+									"        if (metadata.shop && metadata.shop._id) {",
+									"            pm.environment.set(\"user_id\", metadata.shop._id);",
+									"            pm.environment.set(\"user_email\", metadata.shop.email);",
+									"        }",
+									"        ",
+									"        console.log(\"✅ Login successful - Tokens updated:\");",
+									"        console.log(\"Access Token:\", metadata.tokens.accessToken.substring(0, 20) + \"...\");",
+									"        console.log(\"Refresh Token:\", metadata.tokens.refreshToken.substring(0, 20) + \"...\");",
+									"        console.log(\"User ID:\", metadata.shop._id);",
+									"    }",
+									"}",
+									"",
+									"// Test token format",
+									"pm.test(\"Tokens are JWT format\", function () {",
+									"    const responseJson = pm.response.json();",
+									"    if (responseJson.metadata && responseJson.metadata.tokens) {",
+									"        const accessToken = responseJson.metadata.tokens.accessToken;",
+									"        const refreshToken = responseJson.metadata.tokens.refreshToken;",
+									"        ",
+									"        // JWT tokens should have 3 parts separated by dots",
+									"        pm.expect(accessToken.split('.')).to.have.length(3);",
+									"        pm.expect(refreshToken.split('.')).to.have.length(3);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{shop_email}}\",\n    \"password\": \"{{shop_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/login",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "login"]
+						},
+						"description": "Login with existing shop credentials and get new tokens"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test response status",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test response structure",
+									"pm.test(\"Response has correct structure\", function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"    pm.expect(responseJson).to.have.property('message');",
+									"    pm.expect(responseJson).to.have.property('metadata');",
+									"});",
+									"",
+									"// Save new tokens if successful",
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    const metadata = responseJson.metadata;",
+									"    ",
+									"    if (metadata && metadata.tokens) {",
+									"        // Save the old tokens for comparison",
+									"        const oldAccessToken = pm.environment.get(\"access_token\");",
+									"        const oldRefreshToken = pm.environment.get(\"refresh_token\");",
+									"        ",
+									"        // Save new tokens to environment",
+									"        pm.environment.set(\"access_token\", metadata.tokens.accessToken);",
+									"        pm.environment.set(\"refresh_token\", metadata.tokens.refreshToken);",
+									"        ",
+									"        console.log(\"✅ Token refresh successful:\");",
+									"        console.log(\"New Access Token:\", metadata.tokens.accessToken.substring(0, 20) + \"...\");",
+									"        console.log(\"New Refresh Token:\", metadata.tokens.refreshToken.substring(0, 20) + \"...\");",
+									"        ",
+									"        // Test that tokens have changed",
+									"        pm.test(\"New tokens are different from old ones\", function () {",
+									"            pm.expect(metadata.tokens.accessToken).to.not.equal(oldAccessToken);",
+									"            pm.expect(metadata.tokens.refreshToken).to.not.equal(oldRefreshToken);",
+									"        });",
+									"    }",
+									"}",
+									"",
+									"// Test token format",
+									"pm.test(\"New tokens are JWT format\", function () {",
+									"    const responseJson = pm.response.json();",
+									"    if (responseJson.metadata && responseJson.metadata.tokens) {",
+									"        const accessToken = responseJson.metadata.tokens.accessToken;",
+									"        const refreshToken = responseJson.metadata.tokens.refreshToken;",
+									"        ",
+									"        // JWT tokens should have 3 parts separated by dots",
+									"        pm.expect(accessToken.split('.')).to.have.length(3);",
+									"        pm.expect(refreshToken.split('.')).to.have.length(3);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							},
+							{
+								"key": "x-client-id",
+								"value": "{{user_id}}",
+								"description": "User ID from login response"
+							},
+							{
+								"key": "x-rtoken-id",
+								"value": "{{refresh_token}}",
+								"description": "Current refresh token (NOTE: Use x-rtoken-id header, not body)"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/handleRefreshToken",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "handleRefreshToken"]
+						},
+						"description": "Refresh access token using refresh token. IMPORTANT: Refresh token is sent in x-rtoken-id header, not in request body."
+					},
+					"response": []
+				},
+				{
+					"name": "Shop Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test response status",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test response structure",
+									"pm.test(\"Response has correct structure\", function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"    pm.expect(responseJson).to.have.property('message');",
+									"});",
+									"",
+									"// Clear tokens from environment after successful logout",
+									"if (pm.response.code === 200) {",
+									"    pm.environment.set(\"access_token\", \"\");",
+									"    pm.environment.set(\"refresh_token\", \"\");",
+									"    pm.environment.set(\"user_id\", \"\");",
+									"    pm.environment.set(\"user_email\", \"\");",
+									"    ",
+									"    console.log(\"✅ Logout successful - Tokens cleared from environment\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							},
+							{
+								"key": "x-client-id",
+								"value": "{{user_id}}",
+								"description": "User ID from login response"
+							},
+							{
+								"key": "authorization",
+								"value": "{{access_token}}",
+								"description": "Access token from login response"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/logout",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "logout"]
+						},
+						"description": "Logout and invalidate all tokens for the user"
+					},
+					"response": []
+				},
+				{
+					"name": "Test Protected Route (Simulated)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test if we can access protected routes with current token",
+									"pm.test(\"Can access with valid token\", function () {",
+									"    // This is a simulation - replace with actual protected route when available",
+									"    const accessToken = pm.environment.get(\"access_token\");",
+									"    pm.expect(accessToken).to.not.be.empty;",
+									"    console.log(\"✅ Access token is available:\", accessToken.substring(0, 20) + \"...\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							},
+							{
+								"key": "x-client-id",
+								"value": "{{user_id}}",
+								"description": "User ID from login response"
+							},
+							{
+								"key": "authorization",
+								"value": "{{access_token}}",
+								"description": "Access token from login response"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/api",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api"]
+						},
+						"description": "Test access to protected routes (currently using health check as simulation)"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints with automated token management"
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Server Health",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test response status",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test response time",
+									"pm.test(\"Response time is less than 1000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"});",
+									"",
+									"// Test response structure",
+									"pm.test(\"Response has success property\", function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"});",
+									"",
+									"console.log(\"✅ Server health check passed\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/api",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api"]
+						},
+						"description": "Check if the server is running and responding"
+					},
+					"response": []
+				}
+			],
+			"description": "Health check endpoints"
+		},
+		{
+			"name": "Token Management Utilities",
+			"item": [
+				{
+					"name": "Check Current Token Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Display current token status",
+									"const accessToken = pm.environment.get(\"access_token\");",
+									"const refreshToken = pm.environment.get(\"refresh_token\");",
+									"const userId = pm.environment.get(\"user_id\");",
+									"const userEmail = pm.environment.get(\"user_email\");",
+									"",
+									"console.log(\"📊 Current Token Status:\");",
+									"console.log(\"User ID:\", userId || \"Not set\");",
+									"console.log(\"User Email:\", userEmail || \"Not set\");",
+									"console.log(\"Access Token:\", accessToken ? accessToken.substring(0, 20) + \"...\" : \"Not set\");",
+									"console.log(\"Refresh Token:\", refreshToken ? refreshToken.substring(0, 20) + \"...\" : \"Not set\");",
+									"",
+									"// Decode JWT payload (base64 decode the middle part)",
+									"if (accessToken) {",
+									"    try {",
+									"        const parts = accessToken.split('.');",
+									"        if (parts.length === 3) {",
+									"            const payload = JSON.parse(atob(parts[1]));",
+									"            console.log(\"🔍 Access Token Payload:\");",
+									"            console.log(\"  User ID:\", payload.userId);",
+									"            console.log(\"  Email:\", payload.email);",
+									"            console.log(\"  Issued At:\", new Date(payload.iat * 1000));",
+									"            console.log(\"  Expires At:\", new Date(payload.exp * 1000));",
+									"            ",
+									"            // Check if token is expired",
+									"            const now = Math.floor(Date.now() / 1000);",
+									"            if (payload.exp < now) {",
+									"                console.log(\"⚠️ Access token is EXPIRED\");",
+									"            } else {",
+									"                console.log(\"✅ Access token is VALID\");",
+									"            }",
+									"        }",
+									"    } catch (e) {",
+									"        console.log(\"❌ Error decoding access token:\", e.message);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Token status check completed\", function () {",
+									"    pm.expect(true).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/v1/api",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api"]
+						},
+						"description": "Utility request to check current token status without making actual API call"
+					},
+					"response": []
+				},
+				{
+					"name": "Clear All Tokens",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Clear all authentication tokens and user data",
+									"pm.environment.set(\"access_token\", \"\");",
+									"pm.environment.set(\"refresh_token\", \"\");",
+									"pm.environment.set(\"user_id\", \"\");",
+									"pm.environment.set(\"user_email\", \"\");",
+									"",
+									"console.log(\"🧹 All tokens and user data cleared from environment\");",
+									"",
+									"pm.test(\"Tokens cleared successfully\", function () {",
+									"    pm.expect(pm.environment.get(\"access_token\")).to.equal(\"\");",
+									"    pm.expect(pm.environment.get(\"refresh_token\")).to.equal(\"\");",
+									"    pm.expect(pm.environment.get(\"user_id\")).to.equal(\"\");",
+									"    pm.expect(pm.environment.get(\"user_email\")).to.equal(\"\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/v1/api",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api"]
+						},
+						"description": "Utility request to clear all tokens from environment variables"
+					},
+					"response": []
+				}
+			],
+			"description": "Utility requests for token management and debugging"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global pre-request script",
+					"console.log(\"🚀 Making request to:\", pm.request.url.toString());",
+					"",
+					"// Check if we have required environment variables",
+					"const requiredVars = ['base_url', 'api_key'];",
+					"const missingVars = requiredVars.filter(varName => !pm.environment.get(varName));",
+					"",
+					"if (missingVars.length > 0) {",
+					"    console.warn(\"⚠️ Missing required environment variables:\", missingVars);",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script",
+					"pm.test(\"Response is JSON\", function () {",
+					"    pm.response.to.be.json;",
+					"});",
+					"",
+					"// Log response time",
+					"console.log(\"⏱️ Response time:\", pm.response.responseTime + \"ms\");",
+					"",
+					"// Log any errors",
+					"if (pm.response.code >= 400) {",
+					"    console.error(\"❌ Request failed with status:\", pm.response.code);",
+					"    console.error(\"Response:\", pm.response.text());",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3052",
+			"type": "string",
+			"description": "Base URL for the API server"
+		},
+		{
+			"key": "api_key",
+			"value": "856933ce9d295b31063a12cc83c108e5adbf320d2c0087ce9741c077cba8cbcc50ac3c481c8380dc888c3beea8c5f0264e2141b81e7d003aec3ebbe687aae72a",
+			"type": "string",
+			"description": "API key for authentication with the server"
+		},
+		{
+			"key": "shop_name",
+			"value": "Test Shop Enhanced",
+			"type": "string",
+			"description": "Default shop name for testing"
+		},
+		{
+			"key": "shop_email",
+			"value": "testshop.enhanced@example.com",
+			"type": "string",
+			"description": "Default shop email for testing"
+		},
+		{
+			"key": "shop_password",
+			"value": "password123",
+			"type": "string",
+			"description": "Default shop password for testing"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string",
+			"description": "Current access token (automatically managed)"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string",
+			"description": "Current refresh token (automatically managed)"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string",
+			"description": "Current user ID (automatically set after login)"
+		},
+		{
+			"key": "user_email",
+			"value": "",
+			"type": "string",
+			"description": "Current user email (automatically set after login)"
+		}
+	]
+} 

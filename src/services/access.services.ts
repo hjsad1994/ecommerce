@@ -31,70 +31,35 @@ const roleShop = {
     ADMIN: 'ADMIN',
 }
 class AccessService {
-    /**
-     * Xử lý refresh token để cấp mới access token và refresh token
-     * 
-     * Cơ chế bảo mật:
-     * 1. Kiểm tra refresh token có bị sử dụng trước đó chưa (detect token reuse attack)
-     * 2. Nếu đã được sử dụng -> xóa tất cả token của user (nghi ngờ tấn công)
-     * 3. Nếu chưa được sử dụng -> tạo cặp token mới và đánh dấu token cũ đã sử dụng
-     * 
-     * @param refreshToken - Refresh token từ client gửi lên
-     * @returns Object chứa thông tin shop và cặp token mới
-     */
-    static handleRefreshToken = async (refreshToken: string) => {
-        // Bước 1: Kiểm tra refresh token có trong danh sách đã sử dụng không
-        // Điều này giúp phát hiện token reuse attack (khi hacker sử dụng lại token cũ)
-        const foundToken = await KeyTokenService.findByRefreshTokenUsed(refreshToken);
-        if (foundToken) {
-            // Nếu token đã được sử dụng trước đó -> nghi ngờ tấn công
-            // Giải mã token để lấy thông tin user
-            const decoded = await verifyJWT(refreshToken, foundToken.privateKey);
-            const { userId, email } = decoded as { userId: string, email: string };
-            
-            // Xóa tất cả token của user này để bảo vệ tài khoản
-            await KeyTokenService.deleteTokenUsed(new Types.ObjectId(userId));
-            throw new ForbiddenError('Something went wrong');
+    static handleRefreshToken = async ({refreshToken, user, keyStore}: {refreshToken: string, user: any, keyStore: any}) => {
+        const { userId, email } = user;
+        if (keyStore.refreshTokenUsed.includes(refreshToken)) {
+            await KeyTokenService.deleteTokenUsed(userId);
+            throw new ForbiddenError('Something went wrong with refresh token');
         }
-
-        // Bước 2: Tìm keyStore chứa refresh token hợp lệ
-        const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
-        if (!holderToken) {
+        if (keyStore.refreshToken !== refreshToken) {
             throw new AuthFailureError('Shop not registered');
         }
-
-        // Bước 3: Xác minh và giải mã refresh token
-        const decoded = await verifyJWT(refreshToken, holderToken.privateKey);
-        const { userId, email } = decoded as { userId: string, email: string };
-
-        // Bước 4: Kiểm tra shop có tồn tại trong database không
         const foundShop = await shopServices.findByEmail(email);
-        if(!foundShop) {
+        if (!foundShop) {
             throw new AuthFailureError('Shop not registered');
         }
-
-        // Bước 5: Tạo cặp token mới (access token + refresh token)
         const tokens = await createTokenPairs({
             userId,
             email,
-        }, holderToken.publicKey, holderToken.privateKey);
-        if(!tokens) {
+        }, keyStore.publicKey, keyStore.privateKey);
+        if (!tokens) {
             throw new InternalServerError('Failed to generate authentication tokens. Please try again.');
-        }
-
-        // Bước 6: Cập nhật keyStore
-        // - Lưu refresh token mới
-        // - Thêm refresh token cũ vào danh sách đã sử dụng (để phát hiện reuse attack)
-        await holderToken.updateOne({
+        }        
+        // Update the keyStore document with new refresh token and add old one to used list
+        await keyStore.updateOne({
             $set: {
-                refreshToken: tokens.refreshToken, // Refresh token mới
+                refreshToken: tokens.refreshToken,
             },
             $addToSet: {
-                refreshTokenUsed: refreshToken // Thêm token cũ vào danh sách đã sử dụng
+                refreshTokenUsed: refreshToken
             }
         })
-
-        // Bước 7: Trả về thông tin shop và cặp token mới
         return {
             shop: getInfoData<ShopResponse>({
                 fields: ['_id', 'email'],

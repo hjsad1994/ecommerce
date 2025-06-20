@@ -4,8 +4,10 @@
 declare global {
     namespace Express {
         interface Request {
-            keyStore?: any; // KeyToken storage from authentication middleware
-            objKey?: any;   // API key object from checkAuth middleware
+            keyStore?: any;
+            objKey?: any;
+            refreshToken?: string;
+            user?: any;
         }
         
         interface Error {

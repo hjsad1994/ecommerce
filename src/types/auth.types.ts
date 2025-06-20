@@ -10,6 +10,7 @@ export interface AuthenticatedRequest extends Request {
     shop?: AuthenticatedShop;
     objKey?: any; // For API key middleware
     keyStore?: any; // For key token storage
+    refreshToken?: string; // For refresh token middleware
 }
 
 // =============================================================================

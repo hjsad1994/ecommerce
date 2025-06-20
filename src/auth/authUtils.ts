@@ -9,6 +9,7 @@ const HEADER = {
     API_KEY: 'x-api-key',
     CLIENT_ID: 'x-client-id',
     AUTHORIZATION: 'authorization',
+    REFRESH_TOKEN: 'x-rtoken-id'
 }
 const createTokenPairs = async (payload: any, accessTokenSecret: string, refreshTokenSecret: string) => {
     try {
@@ -16,12 +17,12 @@ const createTokenPairs = async (payload: any, accessTokenSecret: string, refresh
         const accessToken = jwt.sign(payload, accessTokenSecret, {
             expiresIn: '2 days'
         });
-        
+
         // create refresh token using refresh token secret
         const refreshToken = jwt.sign(payload, refreshTokenSecret, {
             expiresIn: '7 days'
         });
-        
+
         return { accessToken, refreshToken };
 
     } catch (error) {
@@ -38,29 +39,41 @@ const authencation = asyncHandler(async (req: Request, res: Response, next: Next
     5. check keyStore with this userId
     6. ok all => return next()
      */
-    
+
     const userId = req.headers[HEADER.CLIENT_ID] as string;
     if (!userId) {
         throw new UnauthorizedError('Invalid request - missing user ID');
     }
-    
+
     const keyStore = await KeyTokenServices.findByUserId(new Types.ObjectId(userId));
-    if(!keyStore) {
+    if (!keyStore) {
         throw new NotFoundError('Not found keyStore');
     }
-    
+    if (req.headers[HEADER.REFRESH_TOKEN]) {
+        try {
+            const refreshToken = req.headers[HEADER.REFRESH_TOKEN] as string;
+            const decodeUser = await verifyJWT(refreshToken, keyStore.privateKey);
+            (req as any).keyStore = keyStore;
+            (req as any).user = decodeUser;
+            (req as any).refreshToken = refreshToken;
+            return next();
+        } catch (error) {
+            throw error;
+        }
+
+    }
     const accessToken = req.headers[HEADER.AUTHORIZATION] as string;
-    if(!accessToken) {
+    if (!accessToken) {
         throw new UnauthorizedError('Invalid request - missing access token');
     }
 
     try {
         const decodeUser = jwt.verify(accessToken, keyStore.publicKey);
-        
-        if(userId !== (decodeUser as any).userId) {
+
+        if (userId !== (decodeUser as any).userId) {
             throw new AuthFailureError('Invalid user id');
         }
-        
+
         (req as any).keyStore = keyStore;
 
         return next();

@@ -1,13 +1,13 @@
 # Product Context - E-commerce Backend
 
-## Vấn đề giải quyết
-Dự án này xây dựng backend API cho một hệ thống thương mại điện tử hoàn chỉnh, cung cấp:
+## Problem Being Solved
+This project builds a backend API for a complete e-commerce system, providing:
 
-1. **Quản lý sản phẩm**: Cho phép admin thêm, sửa, xóa sản phẩm với đầy đủ thông tin
-2. **Quản lý người dùng**: Hệ thống đăng ký, đăng nhập với phân quyền admin/customer
-3. **Xử lý đơn hàng**: From shopping cart đến payment và order tracking
-4. **Tích hợp thanh toán**: Hỗ trợ multiple payment gateways
-5. **Admin dashboard**: Interface quản lý toàn bộ hệ thống
+1. **Product Management**: Allow admins to add, edit, delete products with complete information
+2. **User Management**: Registration and login system with admin/customer role differentiation
+3. **Order Processing**: From shopping cart to payment and order tracking
+4. **Payment Integration**: Support for multiple payment gateways
+5. **Admin Dashboard**: Interface for managing the entire system
 
 ## Target Users
 - **End customers**: Browsing, searching, ordering products
@@ -15,15 +15,15 @@ Dự án này xây dựng backend API cho một hệ thống thương mại đi�
 - **Third-party integrations**: Payment gateways, shipping services
 
 ## Core Value Propositions
-1. **Type Safety**: TypeScript đảm bảo code quality và reduce bugs
-2. **Scalability**: Architecture thiết kế để scale với traffic cao
+1. **Type Safety**: TypeScript ensures code quality and reduces bugs
+2. **Scalability**: Architecture designed to scale with high traffic
 3. **Maintainability**: Clean code structure, separation of concerns
 4. **Security**: Proper authentication, authorization, input validation
 5. **Performance**: Optimized queries, caching strategies
 
 ## User Experience Goals
 ### For Customers:
-- Fast product search và filtering
+- Fast product search and filtering
 - Seamless checkout process
 - Real-time order tracking
 - Secure payment processing
@@ -37,9 +37,9 @@ Dự án này xây dựng backend API cho một hệ thống thương mại đi�
 ## Business Requirements
 1. **Revenue Generation**: Support multiple revenue streams
 2. **Inventory Management**: Real-time stock tracking
-3. **Customer Insights**: Analytics và reporting
+3. **Customer Insights**: Analytics and reporting
 4. **Compliance**: GDPR, payment security standards
-5. **Integration Ready**: Easy to integrate với frontend apps, mobile apps
+5. **Integration Ready**: Easy integration with frontend apps, mobile apps
 
 ## Success Metrics
 - API response time < 200ms

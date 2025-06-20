@@ -5,8 +5,12 @@ import { handleError } from "@/middlewares/handle.error";
 import { AuthenticatedRequest } from "@/types";
 
 class AccessController {
-    handleRefreshToken = handleError(async (req: Request, res: Response, next: NextFunction) => {
-        const result = await AccessService.handleRefreshToken(req.body.refreshToken);
+    handleRefreshToken = handleError(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        const result = await AccessService.handleRefreshToken({
+            refreshToken: req.refreshToken as string,
+            user: req.user as any,
+            keyStore: req.keyStore as any
+        });
         new SuccessResponse({
             message: 'Refresh token successfully',
             metadata: result

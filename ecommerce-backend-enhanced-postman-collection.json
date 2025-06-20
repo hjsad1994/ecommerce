@@ -1,0 +1,348 @@
+{
+	"info": {
+		"_postman_id": "ecommerce-backend-enhanced",
+		"name": "E-commerce Backend API - Enhanced",
+		"description": "Enhanced collection with automated refresh token logic and comprehensive testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication Flow",
+			"item": [
+				{
+					"name": "Shop Sign Up",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const responseJson = pm.response.json();",
+									"    const metadata = responseJson.metadata;",
+									"    ",
+									"    if (metadata && metadata.tokens) {",
+									"        pm.environment.set(\"access_token\", metadata.tokens.accessToken);",
+									"        pm.environment.set(\"refresh_token\", metadata.tokens.refreshToken);",
+									"        ",
+									"        if (metadata.shop && metadata.shop._id) {",
+									"            pm.environment.set(\"user_id\", metadata.shop._id);",
+									"            pm.environment.set(\"user_email\", metadata.shop.email);",
+									"        }",
+									"        ",
+									"        console.log(\"✅ Tokens saved successfully\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{shop_name}}\",\n    \"email\": \"{{shop_email}}\",\n    \"password\": \"{{shop_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/signup",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "signup"]
+						}
+					}
+				},
+				{
+					"name": "Shop Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const responseJson = pm.response.json();",
+									"    const metadata = responseJson.metadata;",
+									"    ",
+									"    if (metadata && metadata.tokens) {",
+									"        pm.environment.set(\"access_token\", metadata.tokens.accessToken);",
+									"        pm.environment.set(\"refresh_token\", metadata.tokens.refreshToken);",
+									"        ",
+									"        if (metadata.shop && metadata.shop._id) {",
+									"            pm.environment.set(\"user_id\", metadata.shop._id);",
+									"            pm.environment.set(\"user_email\", metadata.shop.email);",
+									"        }",
+									"        ",
+									"        console.log(\"✅ Login successful - Tokens updated\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{shop_email}}\",\n    \"password\": \"{{shop_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/login",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "login"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token - FIXED",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    const metadata = responseJson.metadata;",
+									"    ",
+									"    if (metadata && metadata.tokens) {",
+									"        const oldAccessToken = pm.environment.get(\"access_token\");",
+									"        const oldRefreshToken = pm.environment.get(\"refresh_token\");",
+									"        ",
+									"        pm.environment.set(\"access_token\", metadata.tokens.accessToken);",
+									"        pm.environment.set(\"refresh_token\", metadata.tokens.refreshToken);",
+									"        ",
+									"        console.log(\"✅ Token refresh successful\");",
+									"        console.log(\"New Access Token:\", metadata.tokens.accessToken.substring(0, 20) + \"...\");",
+									"        ",
+									"        pm.test(\"Tokens are different after refresh\", function () {",
+									"            pm.expect(metadata.tokens.accessToken).to.not.equal(oldAccessToken);",
+									"            pm.expect(metadata.tokens.refreshToken).to.not.equal(oldRefreshToken);",
+									"        });",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key required"
+							},
+							{
+								"key": "x-client-id",
+								"value": "{{user_id}}",
+								"description": "User ID from login"
+							},
+							{
+								"key": "x-rtoken-id",
+								"value": "{{refresh_token}}",
+								"description": "IMPORTANT: Refresh token goes in HEADER, not body!"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/handleRefreshToken",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "handleRefreshToken"]
+						},
+						"description": "FIXED: Refresh token is sent in x-rtoken-id header (not in body)"
+					}
+				},
+				{
+					"name": "Shop Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    pm.environment.set(\"access_token\", \"\");",
+									"    pm.environment.set(\"refresh_token\", \"\");",
+									"    pm.environment.set(\"user_id\", \"\");",
+									"    console.log(\"✅ Logout successful - Tokens cleared\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}"
+							},
+							{
+								"key": "x-client-id",
+								"value": "{{user_id}}"
+							},
+							{
+								"key": "authorization",
+								"value": "{{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/logout",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Token Management Utilities",
+			"item": [
+				{
+					"name": "Check Token Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const accessToken = pm.environment.get(\"access_token\");",
+									"const refreshToken = pm.environment.get(\"refresh_token\");",
+									"const userId = pm.environment.get(\"user_id\");",
+									"",
+									"console.log(\"📊 Current Token Status:\");",
+									"console.log(\"User ID:\", userId || \"Not set\");",
+									"console.log(\"Access Token:\", accessToken ? accessToken.substring(0, 20) + \"...\" : \"Not set\");",
+									"console.log(\"Refresh Token:\", refreshToken ? refreshToken.substring(0, 20) + \"...\" : \"Not set\");",
+									"",
+									"if (accessToken) {",
+									"    try {",
+									"        const parts = accessToken.split('.');",
+									"        if (parts.length === 3) {",
+									"            const payload = JSON.parse(atob(parts[1]));",
+									"            console.log(\"Token expires at:\", new Date(payload.exp * 1000));",
+									"            ",
+									"            const now = Math.floor(Date.now() / 1000);",
+									"            if (payload.exp < now) {",
+									"                console.log(\"⚠️ Access token is EXPIRED - Use refresh token!\");",
+									"            } else {",
+									"                console.log(\"✅ Access token is VALID\");",
+									"            }",
+									"        }",
+									"    } catch (e) {",
+									"        console.log(\"❌ Error decoding token:\", e.message);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Token check completed\", () => pm.expect(true).to.be.true);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/v1/api",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3052",
+			"type": "string"
+		},
+		{
+			"key": "api_key",
+			"value": "856933ce9d295b31063a12cc83c108e5adbf320d2c0087ce9741c077cba8cbcc50ac3c481c8380dc888c3beea8c5f0264e2141b81e7d003aec3ebbe687aae72a",
+			"type": "string"
+		},
+		{
+			"key": "shop_name",
+			"value": "Test Shop Enhanced",
+			"type": "string"
+		},
+		{
+			"key": "shop_email",
+			"value": "testshop.enhanced@example.com",
+			"type": "string"
+		},
+		{
+			"key": "shop_password",
+			"value": "password123",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_email",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 

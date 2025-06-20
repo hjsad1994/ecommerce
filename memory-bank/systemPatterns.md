@@ -1,7 +1,7 @@
 # System Patterns - E-commerce Backend
 
 ## Architecture Overview - IMPLEMENTED ✅
-Dự án sử dụng **Layered Architecture** với separation of concerns:
+Project uses **Layered Architecture** with separation of concerns:
 
 ```
 ┌─────────────────┐
@@ -18,7 +18,7 @@ Dự án sử dụng **Layered Architecture** với separation of concerns:
 ## Design Patterns Implemented ✅
 
 ### 1. MVC Pattern ✅
-- **Models**: Database schemas và data operations (Shop, KeyToken, ApiKey)
+- **Models**: Database schemas and data operations (Shop, KeyToken, ApiKey)
 - **Controllers**: Route handlers, HTTP request/response (AccessController)
 - **Services**: Business logic layer (AccessService, ShopService, KeyTokenService)
 
@@ -29,19 +29,19 @@ Dự án sử dụng **Layered Architecture** với separation of concerns:
 - **Logging**: Morgan HTTP request logging ✅
 
 ### 3. Factory Pattern ✅
-- **Error Factory**: `AppError` class cho consistent error creation ✅
+- **Error Factory**: `AppError` class for consistent error creation ✅
 - **Response Factory**: Standardized `ApiResponse` format ✅
-- **Token Factory**: JWT token creation với authUtils ✅
+- **Token Factory**: JWT token creation with authUtils ✅
 
 ### 4. Service Layer Pattern ✅
 - **Dependency Injection**: Service layer separation ✅
-- **Business Logic Isolation**: Pure business logic trong services ✅
-- **Testable Architecture**: Easy mocking và unit testing ✅
+- **Business Logic Isolation**: Pure business logic in services ✅
+- **Testable Architecture**: Easy mocking and unit testing ✅
 
 ### 5. Static Class Pattern ✅
-- **AccessService**: Static methods cho authentication operations ✅
-- **KeyTokenService**: Static methods cho token management ✅
-- **ApiKeyService**: Static methods cho API key validation ✅
+- **AccessService**: Static methods for authentication operations ✅
+- **KeyTokenService**: Static methods for token management ✅
+- **ApiKeyService**: Static methods for API key validation ✅
 
 ## Key Components - WORKING ✅
 
@@ -172,7 +172,7 @@ src/
    - API key-based authentication ✅
    - JWT-based stateless auth ✅
 3. **Authorization**: Permission-based access control ✅
-4. **Password Security**: bcrypt hashing với salt ✅
+4. **Password Security**: bcrypt hashing with salt ✅
 5. **Error Sanitization**: Safe error responses ✅
 6. **Rate Limiting**: Planned (next phase)
 
@@ -195,8 +195,8 @@ Response ← Success/Error Response ← Service ← Controller ← Middleware
 
 ## Configuration Pattern - ESTABLISHED ✅
 - **Environment-based configuration** ✅
-- **Type-safe configuration với TypeScript** ✅
-- **Separate configs cho dev/prod/test** ✅
+- **Type-safe configuration with TypeScript** ✅
+- **Separate configs for dev/prod/test** ✅
 - **MongoDB connection string management** ✅
 - **JWT secret management** ✅
 
@@ -213,7 +213,7 @@ Response ← Success/Error Response ← Service ← Controller ← Middleware
    - Symmetric key generation
    - JWT token creation
    - KeyToken storage
-5. Response với shop info + tokens
+5. Response with shop info + tokens
 
 // Login Flow - WORKING (Fixed "Invalid Signature")
 1. Client POST /v1/api/shop/login
@@ -224,9 +224,9 @@ Response ← Success/Error Response ← Service ← Controller ← Middleware
    - Password verification
    - New symmetric key generation (atomic)
    - KeyToken database update FIRST
-   - JWT token creation với same stored keys
+   - JWT token creation with same stored keys
    - Refresh token update
-5. Response với shop info + new tokens
+5. Response with shop info + new tokens
 // ✅ Fixed: Atomic operations prevent race conditions
 ```
 
@@ -285,8 +285,8 @@ const handleError = (err, req, res, next) => {
 
 ### 2. Unit Testing (Planned)
 - **Service Layer Testing**: Isolated business logic testing
-- **Mock Objects**: Database và external service mocks
-- **Test Data**: Factory pattern cho test data generation
+- **Mock Objects**: Database and external service mocks
+- **Test Data**: Factory pattern for test data generation
 - **Coverage Reporting**: Jest coverage integration
 
 ### 3. Integration Testing (Planned)
@@ -303,7 +303,7 @@ const handleError = (err, req, res, next) => {
 
 ### 2. Database Patterns ✅
 - **Connection Pooling**: MongoDB Atlas optimized connections
-- **Schema Optimization**: Proper indexing và relationships
+- **Schema Optimization**: Proper indexing and relationships
 - **Query Optimization**: Efficient data retrieval
 
 ### 3. Caching Patterns (Planned)
@@ -339,8 +339,8 @@ const handleError = (err, req, res, next) => {
 
 ### 3. Security Patterns ✅
 - **Input Sanitization**: Type-safe request handling
-- **Password Security**: Proper hashing và salting
-- **JWT Security**: Secure token generation và storage
+- **Password Security**: Proper hashing and salting
+- **JWT Security**: Secure token generation and storage
 - **API Security**: Key-based authentication
 
 ## Architecture Status Summary ✅

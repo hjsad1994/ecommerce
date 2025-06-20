@@ -45,6 +45,7 @@ export interface AuthenticatedRequest extends Request {
     };
     keyStore?: any; // KeyToken storage from authentication middleware
     objKey?: any;   // API key object from checkAuth middleware
+    refreshToken?: string; // For refresh token middleware
 }
 
 // =============================================================================
