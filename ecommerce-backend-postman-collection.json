@@ -64,6 +64,43 @@
 					"response": []
 				},
 				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"description": "API Key for authentication"
+							},
+							{
+								"key": "x-client-id",
+								"value": "{{user_id}}",
+								"description": "User ID from login response"
+							},
+							{
+								"key": "authorization",
+								"value": "{{access_token}}",
+								"description": "Access token from login response"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/api/shop/handleRefreshToken",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "api", "shop", "handleRefreshToken"]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Shop Logout",
 					"request": {
 						"method": "POST",
@@ -135,7 +172,7 @@
 		},
 		{
 			"key": "api_key",
-			"value": "471d67417d84beac5467869a67c315bd85d1b43f3fb0f4a7227ce737ec84245d409cb740fd69ecae6e2be5b2a4facf837fcd487703da4fec33a0cee7a3b0e078",
+			"value": "856933ce9d295b31063a12cc83c108e5adbf320d2c0087ce9741c077cba8cbcc50ac3c481c8380dc888c3beea8c5f0264e2141b81e7d003aec3ebbe687aae72a",
 			"type": "string"
 		},
 		{

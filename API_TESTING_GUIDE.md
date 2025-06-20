@@ -49,7 +49,7 @@ Hoặc sử dụng existing API key nếu có.
 }
 ```
 
-#### 2. Shop Login (Newly Fixed)
+#### 2. Shop Login
 - **Method**: `POST`
 - **URL**: `/v1/api/shop/login`
 - **Headers**: 
@@ -62,6 +62,31 @@ Hoặc sử dụng existing API key nếu có.
     "password": "password123"
 }
 ```
+
+#### 3. Refresh Token (NEW)
+- **Method**: `POST`
+- **URL**: `/v1/api/shop/handleRefreshToken`
+- **Headers**: 
+  - `Content-Type: application/json`
+  - `x-api-key: your-api-key`
+  - `x-client-id: {{user_id}}` (từ login response)
+  - `authorization: {{access_token}}` (từ login response)
+- **Body**:
+```json
+{
+    "refreshToken": "{{refresh_token}}"
+}
+```
+
+#### 4. Shop Logout
+- **Method**: `POST`
+- **URL**: `/v1/api/shop/logout`
+- **Headers**: 
+  - `Content-Type: application/json`
+  - `x-api-key: your-api-key`
+  - `x-client-id: {{user_id}}` (từ login response)
+  - `authorization: {{access_token}}` (từ login response)
+- **Body**: Empty
 
 ### 🔍 Health Check
 
@@ -90,12 +115,31 @@ Hoặc sử dụng existing API key nếu có.
    - Shop info (name, email, _id)
    - Access token và refresh token
 
-### Step 4: Test Shop Login (NEW)
+### Step 4: Test Shop Login
 1. Sử dụng email/password từ shop đã register
 2. Send login request
 3. Verify response chứa:
    - Shop info
    - New tokens
+4. **Important**: Lưu `access_token`, `refresh_token`, và `user_id` vào Postman variables để dùng cho các API tiếp theo
+
+### Step 5: Test Refresh Token (NEW)
+1. Đảm bảo bạn đã có `refresh_token` từ login response
+2. Set Postman variables:
+   - `{{access_token}}`: Access token từ login
+   - `{{refresh_token}}`: Refresh token từ login
+   - `{{user_id}}`: User ID từ shop object trong login response
+3. Send refresh token request
+4. Verify response chứa:
+   - Shop info
+   - New token pair (access + refresh)
+5. **Security Test**: Thử sử dụng refresh token cũ lần nữa - should fail với "Something went wrong"
+
+### Step 6: Test Shop Logout
+1. Sử dụng current `access_token` và `user_id`
+2. Send logout request
+3. Verify logout thành công
+4. Test: Access token không còn valid sau logout
 
 ## 📊 Expected Response Formats
 
@@ -106,9 +150,28 @@ Hoặc sử dụng existing API key nếu có.
     "message": "Shop registered/logged in successfully",
     "metadata": {
         "shop": {
-            "_id": "...",
+            "_id": "685507b8f5c2c5bda85708a1",
             "name": "Test Shop",
             "email": "testshop@example.com"
+        },
+        "tokens": {
+            "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+            "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+        }
+    }
+}
+```
+
+### Successful Refresh Token:
+```json
+{
+    "success": true,
+    "message": "Refresh token successfully",
+    "metadata": {
+        "shop": {
+            "_id": "685507b8f5c2c5bda85708a1",
+            "email": "testshop@example.com"
+            
         },
         "tokens": {
             "accessToken": "eyJhbGciOiJIUzI1NiIs...",
@@ -158,7 +221,9 @@ Hoặc sử dụng existing API key nếu có.
 
 ### Current Status:
 - ✅ Shop Registration: Working
-- ✅ Shop Login: Working (newly fixed)
+- ✅ Shop Login: Working
+- ✅ Refresh Token: Working (newly added)
+- ✅ Shop Logout: Working
 - 🔄 JWT Verification Middleware: Coming next
 - 🔄 Protected Routes: Coming next
 

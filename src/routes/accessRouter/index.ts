@@ -12,4 +12,5 @@ accessRouter.post("/shop/login", handleError(AccessController.login));
 // auth
 accessRouter.use(authencation);
 accessRouter.post("/shop/logout", handleError(AccessController.logout));
+accessRouter.post("/shop/handleRefreshToken", handleError(AccessController.handleRefreshToken));
 export default accessRouter;
